@@ -35,25 +35,32 @@
 </template>
 
 <script lang="ts">
-import { key } from "@/store";
+import { TipoNotificacao } from "@/interfaces/INotificacao";
 import { defineComponent, computed } from "vue";
-import { useStore } from "vuex";
+import { useStore } from "@/store";
 import Temporizador from './Temporizador.vue'
+import { notificacaoMixin } from "@/mixins/notificar";
 
 export default defineComponent({
   name: "Formulário",
+  mixins:[notificacaoMixin],
   emits: ['aoSalvarTarefa'],
   components: {
     Temporizador
   },
   data () {
-    return {
+    return { 
       descricao: '',
       idProjeto: ''
     }
   },
   methods: {
     finalizarTarefa (tempoDecorrido: number) : void {
+      const projeto = this.projetos.find((p) => p.id == this.idProjeto); // primeiro, buscamos pelo projeto
+      if(!projeto) { 
+          this.notificar(TipoNotificacao.FALHA,'Falha na tentativa de cadastro','Selecione um projeto antes de finalizar a tarefa!'); // notificamos o usuário
+          return; // ao fazer return aqui, o restante do método salvarTarefa não será executado. chamamos essa técnica de early return :)
+      }
       this.$emit('aoSalvarTarefa', {
         duracaoEmSegundos: tempoDecorrido,
         descricao: this.descricao,
@@ -63,9 +70,10 @@ export default defineComponent({
     }
   },
   setup(){
-    const store = useStore(key);
+    const store = useStore();
     return {
-      projetos: computed(()=> store.state.projetos)
+      projetos: computed(()=> store.state.projetos),
+      store
     }
   }
 });

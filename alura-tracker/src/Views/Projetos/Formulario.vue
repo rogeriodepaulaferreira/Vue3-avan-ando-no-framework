@@ -21,10 +21,11 @@
 </template>
 
 <script lang="ts">
+    import { TipoNotificacao } from "@/interfaces/INotificacao";
     import { useStore } from "@/store";
     import { ALTERA_PROJETO, ADICIONA_PROJETO } from "@/store/tipo-mutacoes";
-    import { defineComponent } from "vue"; 
-import { RouterLink } from "vue-router";
+    import { defineComponent } from "vue";   
+    import useNotificador from "@/hooks/notificador";
     export default defineComponent({
         name:"Formulario",
         props: {
@@ -39,7 +40,7 @@ import { RouterLink } from "vue-router";
         },
         mounted(){
             if(this.id){
-                const projeto = this.store.state.projetos.find(proj => this.id);
+                const projeto = this.store.state.projetos.find(proj => proj.id == this.id);
                 this.nomeDoProjeto = projeto?.nome || ''
             }
         },
@@ -50,6 +51,8 @@ import { RouterLink } from "vue-router";
                 }else{
                     this.store.commit(ADICIONA_PROJETO,this.nomeDoProjeto);
                     this.nomeDoProjeto = '';
+                    this.notificar(TipoNotificacao.SUCESSO,'Operação executada com sucesso !','O projeto foi salvo com sucesso !');
+                     
                     this.$router.push('/projetos');
                 }
                 
@@ -58,8 +61,10 @@ import { RouterLink } from "vue-router";
         },
         setup(){
             const store = useStore();
+            const { notificar } = useNotificador();
             return { 
-                store
+                store,
+                notificar
             }
         }
     });

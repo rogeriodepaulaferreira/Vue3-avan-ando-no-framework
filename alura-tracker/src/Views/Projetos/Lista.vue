@@ -46,8 +46,7 @@
 <script lang="ts">
     import { useStore } from "@/store";
     import { EXCLUIR_PROJETO } from "@/store/tipo-mutacoes";
-    import { defineComponent, computed } from "vue"; 
-import { RouterLink } from "vue-router";
+    import { defineComponent, computed } from "vue";  
     export default defineComponent({
         name:"Lista",
         methods:{
